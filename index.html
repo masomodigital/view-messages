@@ -93,15 +93,18 @@
           return;
         }
 
-        data.messages.forEach(msg => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${msg.source}</td>
-            <td>${msg.message}</td>
-            <td>${msg.timestamp}</td>
-          `;
-          body.appendChild(row);
-        });
+      data.messages.forEach(msg => {
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>
+      ${msg.source}
+      <button onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" style="margin-left: 5px; padding: 2px 6px; font-size: 12px;">Copy</button>
+    </td>
+    <td>${msg.message}</td>
+    <td>${msg.timestamp}</td>
+  `;
+  body.appendChild(row);
+});
 
         table.style.display = 'table';
 
