@@ -98,7 +98,11 @@
   row.innerHTML = `
     <td>
       ${msg.source}
-      <button onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" style="margin-left: 5px; padding: 2px 6px; font-size: 12px;">Copy</button>
+      <button 
+  onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
+  style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #5bc0de; border: none; border-radius: 3px; cursor: pointer;">
+  Copy
+</button>
     </td>
     <td>${msg.message}</td>
     <td>${msg.timestamp}</td>
