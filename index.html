@@ -2,46 +2,21 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Masomo SMS Viewer</title>
+  <title>Masomo Messages by Promo Code</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f8ff;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      font-size: 16px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-    }
-    th {
-      background: #2c3e50;
-      color: white;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-      margin-top: 10px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8ff; }
+    h1 { text-align: center; color: #2c3e50; }
+    input, button { padding: 10px; margin: 5px; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; }
+    th { background: #2c3e50; color: white; }
+    .error { color: red; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h1>Masomo SMS Messages</h1>
+  <h1>View Messages by Promo Code</h1>
   <div>
-    <input type="text" id="userId" placeholder="Enter your User ID" />
+    <input type="text" id="promoCode" placeholder="Enter your Promo Code" />
     <input type="date" id="filterDate" />
     <button onclick="fetchMessages()">View Messages</button>
   </div>
@@ -61,7 +36,7 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbycpL9-mDmnDcIGThuA4uRfOcqJ07LRLrT7hvDkOJ7jKUtAJrmUQ97Ac-HGtOZqEjZNwQ/exec";
 
     async function fetchMessages() {
-      const userId = document.getElementById('userId').value.trim();
+      const promoCode = document.getElementById('promoCode').value.trim();
       const filterDate = document.getElementById('filterDate').value;
       const errorMsg = document.getElementById('errorMsg');
       const table = document.getElementById('messagesTable');
@@ -71,13 +46,15 @@
       table.style.display = 'none';
       body.innerHTML = '';
 
-      if (!userId) {
-        errorMsg.textContent = 'Please enter your User ID';
+      if (!promoCode) {
+        errorMsg.textContent = 'Please enter your Promo Code.';
         return;
       }
 
       try {
-        const url = `${scriptURL}?userId=${encodeURIComponent(userId)}${filterDate ? `&date=${filterDate}` : ''}`;
+        let url = `${scriptURL}?promoCode=${encodeURIComponent(promoCode)}`;
+        if (filterDate) url += `&date=${filterDate}`;
+
         const response = await fetch(url);
         const data = await response.json();
 
@@ -93,7 +70,11 @@
 
         data.messages.forEach(msg => {
           const row = document.createElement('tr');
-          row.innerHTML = `<td>${msg.source}</td><td>${msg.message}</td><td>${msg.timestamp}</td>`;
+          row.innerHTML = `
+            <td>${msg.source}</td>
+            <td>${msg.message}</td>
+            <td>${msg.timestamp}</td>
+          `;
           body.appendChild(row);
         });
 
@@ -101,8 +82,10 @@
 
       } catch (err) {
         errorMsg.textContent = 'Network error. Please try again.';
+        console.error(err);
       }
     }
   </script>
 </body>
 </html>
+
