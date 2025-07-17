@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masomo Message Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .form-section {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background-color: #27ae60;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #219150;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+    }
+    table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .message-section {
+      max-width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📩 Masomo Message Viewer</h2>
+  <div class="form-section">
+    <label for="userId">User ID</label>
+    <input type="text" id="userId" placeholder="Enter your User ID" required />
+
+    <label for="promoCode">Promo Code</label>
+    <input type="text" id="promoCode" placeholder="Enter your Promo Code" required />
+
+    <label for="date">Filter by Date (optional)</label>
+    <input type="date" id="date" />
+
+    <button onclick="fetchMessages()">View Messages</button>
+    <div id="error" class="error"></div>
+  </div>
+
+  <div class="message-section">
+    <table id="messageTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Phone Number</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="messageBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbycpL9-mDmnDcIGThuA4uRfOcqJ07LRLrT7hvDkOJ7jKUtAJrmUQ97Ac-HGtOZqEjZNwQ/exec";
+
+    function fetchMessages() {
+      const userId = document.getElementById("userId").value.trim();
+      const promoCode = document.getElementById("promoCode").value.trim();
+      const date = document.getElementById("date").value;
+      const errorDiv = document.getElementById("error");
+      const table = document.getElementById("messageTable");
+      const tbody = document.getElementById("messageBody");
+
+      errorDiv.textContent = "";
+      tbody.innerHTML = "";
+      table.style.display = "none";
+
+      if (!userId || !promoCode) {
+        errorDiv.textContent = "Please enter both User ID and Promo Code.";
+        return;
+      }
+
+      let url = `${webAppUrl}?userId=${encodeURIComponent(userId)}&promoCode=${encodeURIComponent(promoCode)}`;
+      if (date) url += `&dateFilter=${encodeURIComponent(date)}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            errorDiv.textContent = data.error;
+            return;
+          }
+
+          if (data.messages.length === 0) {
+            errorDiv.textContent = "No messages found.";
+            return;
+          }
+
+          data.messages.forEach(msg => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${msg.source}</td>
+              <td>${msg.message}</td>
+              <td>${msg.timestamp}</td>
+            `;
+            tbody.appendChild(row);
+          });
+
+          table.style.display = "table";
+        })
+        .catch(err => {
+          console.error(err);
+          errorDiv.textContent = "Something went wrong. Try again later.";
+        });
+    }
+  </script>
+
+</body>
+</html>
