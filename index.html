@@ -36,6 +36,11 @@
       font-weight: bold;
       margin-top: 10px;
     }
+    .waiting {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +73,7 @@
       const body = document.getElementById('messagesBody');
 
       errorMsg.textContent = '';
+      errorMsg.className = 'error';
       table.style.display = 'none';
       body.innerHTML = '';
 
@@ -76,12 +82,20 @@
         return;
       }
 
+      // Show waiting message in green bold
+      errorMsg.textContent = 'Wait please...';
+      errorMsg.className = 'waiting';
+
       try {
         let url = `${scriptURL}?promoCode=${encodeURIComponent(promoCode)}`;
         if (filterDate) url += `&date=${filterDate}`;
 
         const response = await fetch(url);
         const data = await response.json();
+
+        // Clear waiting message
+        errorMsg.textContent = '';
+        errorMsg.className = 'error';
 
         if (!data.success) {
           errorMsg.textContent = data.error || 'Unknown error occurred';
@@ -93,27 +107,28 @@
           return;
         }
 
-      data.messages.forEach(msg => {
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>
-      ${msg.source}
-      <button 
-  onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
-  style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #5bc0de; border: none; border-radius: 3px; cursor: pointer;">
-  Copy
-</button>
-    </td>
-    <td>${msg.message}</td>
-    <td>${msg.timestamp}</td>
-  `;
-  body.appendChild(row);
-});
+        data.messages.forEach(msg => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              ${msg.source}
+              <button 
+                onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
+                style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #87CEEB; border: none; border-radius: 3px; cursor: pointer;">
+                Copy
+              </button>
+            </td>
+            <td>${msg.message}</td>
+            <td>${msg.timestamp}</td>
+          `;
+          body.appendChild(row);
+        });
 
         table.style.display = 'table';
 
       } catch (err) {
         errorMsg.textContent = 'Network error. Please try again.';
+        errorMsg.className = 'error';
         console.error(err);
       }
     }
