@@ -45,7 +45,18 @@
 </head>
 <body>
   <h1>View Messages by Promo Code</h1>
-  <div>
+
+<div style="background-color: #e6f2ff; border: 1px solid #b3d1ff; padding: 15px; margin-bottom: 20px; border-radius: 5px; font-size: 16px; line-height: 1.6;">
+  <strong>Share Your Promo Code to Receive Messages for Free</strong><br><br>
+  You can share your Promo Code with your users, allowing them to send you messages at no cost. Users on the Safaricom network can send SMS offline by texting their message to the shortcode <strong>40015</strong>.<br><br>
+
+  <strong>Example message:</strong><br>
+  <em>Masomo Give me details regarding your program and the applicable fees please. 255896</em><br>
+  <small>(Note: The Promo Code <strong>"255896"</strong> should appear at the end of the message.)</small><br><br>
+
+  Once the message is sent, you will be able to view both the message content and the sender's phone number directly on your dashboard. The user does <strong>not</strong> need to have airtime to send the message.
+</div>
+<div>
     <input type="text" id="promoCode" placeholder="Enter your Promo Code" />
     <input type="date" id="filterDate" />
     <button onclick="fetchMessages()" style="background-color: green; color: white;">View Messages</button>
