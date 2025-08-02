@@ -10,10 +10,12 @@
       padding: 20px;
       background: #f8f8ff;
     }
+
     h1 {
       text-align: center;
       color: #2c3e50;
     }
+
     input, button {
       padding: 10px;
       margin: 5px;
@@ -21,6 +23,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     .form-container {
       display: flex;
       flex-wrap: wrap;
@@ -28,38 +31,62 @@
       justify-content: center;
       margin-bottom: 10px;
     }
-    .error {
-      color: red;
+
+    .error, .waiting {
       font-weight: bold;
       margin-top: 10px;
       text-align: center;
     }
-    .waiting {
-      color: green;
-      font-weight: bold;
-      margin-top: 10px;
-      text-align: center;
-    }
+
+    .error { color: red; }
+    .waiting { color: green; }
+
     .table-container {
       overflow-x: auto;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
       min-width: 600px;
     }
+
     th, td {
       padding: 10px;
       border: 1px solid #ddd;
     }
+
     th {
       background: #2c3e50;
       color: white;
     }
+
+    #main-content {
+      display: none;
+    }
+
+    #login-container {
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #login-container input {
+      width: 250px;
+    }
   </style>
 </head>
 <body>
+
+<div id="login-container">
+  <h1>Promo Code Login</h1>
+  <input type="text" id="loginCode" placeholder="Enter your Promo Code" />
+  <br />
+  <button onclick="login()">Login</button>
+  <div id="loginError" class="error"></div>
+</div>
+
+<div id="main-content">
   <h1>View Messages by Promo Code</h1>
 
   <div style="background-color: #e6f2ff; border: 1px solid #b3d1ff; padding: 15px; margin-bottom: 20px; border-radius: 5px; font-size: 16px; line-height: 1.6;">
@@ -68,8 +95,8 @@
 
     <strong>Example message:</strong><br>
     <span style="color:blue;">
-  <em><span style="color:red;">Masomo</span> I shall be visiting you on Saturday at 2.00pm. Thanks, Dan <span style="color:red;">255896</span></em>
-</span><br>
+      <em><span style="color:red;">Masomo</span> I shall be visiting you on Saturday at 2.00pm. Thanks, Dan <span style="color:red;">255896</span></em>
+    </span><br>
     <small>(Note: The Promo Code <strong>"255896"</strong> should appear at the end of the message.)</small><br><br>
 
     Once the message is sent, you will be able to view both the message content and the sender's phone number directly on your dashboard. The user does <strong>NOT</strong> need to have airtime to send the message.
@@ -79,9 +106,9 @@
     <input type="text" id="promoCode" placeholder="Enter your Promo Code" />
     <input type="date" id="filterDate" />
     <button onclick="fetchMessages()" style="background-color: green; color: white;">View Messages</button>
-<button onclick="window.location.href='https://masomodigital.github.io/sms-credits-balance/'" style="background-color: red; color: white;">Get my Promo Code</button>
-<button onclick="window.location.href='https://masomodigital.github.io/REVERSE-SMS/'" style="background-color: black; color: white;">Reverse SMS</button>
-</div>
+    <button onclick="window.location.href='https://masomodigital.github.io/sms-credits-balance/'" style="background-color: red; color: white;">Get my Promo Code</button>
+    <button onclick="window.location.href='https://masomodigital.github.io/REVERSE-SMS/'" style="background-color: black; color: white;">Reverse SMS</button>
+  </div>
 
   <div class="error" id="errorMsg"></div>
 
@@ -97,77 +124,107 @@
       <tbody id="messagesBody"></tbody>
     </table>
   </div>
+</div>
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbycpL9-mDmnDcIGThuA4uRfOcqJ07LRLrT7hvDkOJ7jKUtAJrmUQ97Ac-HGtOZqEjZNwQ/exec";
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbycpL9-mDmnDcIGThuA4uRfOcqJ07LRLrT7hvDkOJ7jKUtAJrmUQ97Ac-HGtOZqEjZNwQ/exec";
 
-    async function fetchMessages() {
-      const promoCode = document.getElementById('promoCode').value.trim();
-      const filterDate = document.getElementById('filterDate').value;
-      const errorMsg = document.getElementById('errorMsg');
-      const table = document.getElementById('messagesTable');
-      const body = document.getElementById('messagesBody');
+  function login() {
+    const code = document.getElementById("loginCode").value.trim();
+    const loginError = document.getElementById("loginError");
+
+    loginError.textContent = '';
+
+    if (!code) {
+      loginError.textContent = "Please enter your Promo Code.";
+      return;
+    }
+
+    loginError.textContent = "Checking, please wait...";
+    loginError.className = "waiting";
+
+    fetch(`${scriptURL}?promoCode=${encodeURIComponent(code)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("promoCode").value = code;
+          document.getElementById("login-container").style.display = "none";
+          document.getElementById("main-content").style.display = "block";
+        } else {
+          loginError.textContent = data.error || "Invalid Promo Code.";
+          loginError.className = "error";
+        }
+      })
+      .catch(() => {
+        loginError.textContent = "Network error. Please try again.";
+        loginError.className = "error";
+      });
+  }
+
+  async function fetchMessages() {
+    const promoCode = document.getElementById('promoCode').value.trim();
+    const filterDate = document.getElementById('filterDate').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const table = document.getElementById('messagesTable');
+    const body = document.getElementById('messagesBody');
+
+    errorMsg.textContent = '';
+    errorMsg.className = 'error';
+    table.style.display = 'none';
+    body.innerHTML = '';
+
+    if (!promoCode) {
+      errorMsg.textContent = 'Please enter your Promo Code.';
+      return;
+    }
+
+    errorMsg.textContent = 'Wait please...';
+    errorMsg.className = 'waiting';
+
+    try {
+      let url = `${scriptURL}?promoCode=${encodeURIComponent(promoCode)}`;
+      if (filterDate) url += `&date=${filterDate}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
 
       errorMsg.textContent = '';
       errorMsg.className = 'error';
-      table.style.display = 'none';
-      body.innerHTML = '';
 
-      if (!promoCode) {
-        errorMsg.textContent = 'Please enter your Promo Code.';
+      if (!data.success) {
+        errorMsg.textContent = data.error || 'Unknown error occurred';
         return;
       }
 
-      // Show waiting message in green bold
-      errorMsg.textContent = 'Wait please...';
-      errorMsg.className = 'waiting';
-
-      try {
-        let url = `${scriptURL}?promoCode=${encodeURIComponent(promoCode)}`;
-        if (filterDate) url += `&date=${filterDate}`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        // Clear waiting message
-        errorMsg.textContent = '';
-        errorMsg.className = 'error';
-
-        if (!data.success) {
-          errorMsg.textContent = data.error || 'Unknown error occurred';
-          return;
-        }
-
-        if (data.messages.length === 0) {
-          errorMsg.textContent = 'No messages found for the selected criteria.';
-          return;
-        }
-
-        data.messages.forEach(msg => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>
-              ${msg.source}
-              <button 
-                onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
-                style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #87CEEB; border: none; border-radius: 3px; cursor: pointer;">
-                Copy
-              </button>
-            </td>
-            <td>${msg.message}</td>
-            <td>${msg.timestamp}</td>
-          `;
-          body.appendChild(row);
-        });
-
-        table.style.display = 'table';
-
-      } catch (err) {
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.className = 'error';
-        console.error(err);
+      if (data.messages.length === 0) {
+        errorMsg.textContent = 'No messages found for the selected criteria.';
+        return;
       }
+
+      data.messages.forEach(msg => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            ${msg.source}
+            <button 
+              onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
+              style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #87CEEB; border: none; border-radius: 3px; cursor: pointer;">
+              Copy
+            </button>
+          </td>
+          <td>${msg.message}</td>
+          <td>${msg.timestamp}</td>
+        `;
+        body.appendChild(row);
+      });
+
+      table.style.display = 'table';
+    } catch (err) {
+      errorMsg.textContent = 'Network error. Please try again.';
+      errorMsg.className = 'error';
+      console.error(err);
     }
-  </script>
+  }
+</script>
 </body>
 </html>
