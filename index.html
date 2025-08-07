@@ -215,7 +215,10 @@
             </button>
           </td>
           <td>${msg.message}</td>
-          <td>${msg.timestamp}</td>
+          <td>
+  <div>${msg.timestamp.split(' ')[0]}</div>
+  <div style="color: green; font-weight: bold;">${msg.timestamp.split(' ')[1]}</div>
+</td>
         `;
         body.appendChild(row);
       });
