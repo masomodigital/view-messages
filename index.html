@@ -6,9 +6,10 @@
   <title>View Messages by Promo Code</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       padding: 20px;
-      background: #f8f8ff;
+      background: #f4f6f9;
+      margin: 0;
     }
 
     h1 {
@@ -16,21 +17,41 @@
       color: #2c3e50;
     }
 
-    input, button {
+    input {
       padding: 10px;
-      margin: 5px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
     }
 
     .form-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 180px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    .btn-green { background: #28a745; color: #fff; }
+    .btn-red { background: #dc3545; color: #fff; }
+    .btn-black { background: #343a40; color: #fff; }
+    .btn-blue { background: #007bff; color: #fff; }
 
     .error, .waiting {
       font-weight: bold;
@@ -43,18 +64,23 @@
 
     .table-container {
       overflow-x: auto;
+      margin-top: 20px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
       min-width: 600px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
     th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
     }
 
     th {
@@ -68,29 +94,61 @@
 
     #login-container {
       text-align: center;
-      margin-top: 100px;
+      margin-top: 80px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #login-container input {
       width: 250px;
+      margin-bottom: 10px;
     }
+
+    .info-box {
+      background-color: #e6f2ff;
+      border: 1px solid #b3d1ff;
+      padding: 18px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .copy-btn {
+      margin-left: 5px;
+      padding: 3px 8px;
+      font-size: 12px;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover { background-color: #0056b3; }
   </style>
 </head>
 <body>
 
 <div id="login-container">
-  <img src="https://i.imgur.com/ZZxgHlA.jpeg" alt="Login Image" style="max-width: 200px; margin-bottom: 20px;" />
+  <img src="https://i.imgur.com/ZZxgHlA.jpeg" alt="Login Image" style="max-width: 160px; margin-bottom: 20px;" />
   <h1>USER LOGIN</h1>
-  <p style="color: blue; font-weight: bold;">Login to view your messages.</p>
+  <p style="color: #007bff; font-weight: bold;">Login to view your messages.</p>
   <input type="text" id="loginCode" placeholder="Enter your Promo Code" />
   <br />
-  <button onclick="login()" style="background-color: green; color: white;">Login</button>
+  <button onclick="login()" class="btn-green">Login</button>
   
   <br /><br />
-  <button onclick="window.location.href='https://masomodigital.github.io/POST-A-MESSAGE/'" style="background-color: black; color: white; width: 100%;">POST MESSAGE TO MY CONTACTS</button>
+  <button onclick="window.location.href='https://masomodigital.github.io/POST-A-MESSAGE/'" class="btn-black">POST MESSAGE TO MY CONTACTS</button>
   
   <br /><br />
-  <button onclick="window.location.href='https://masomodigital.github.io/post-message/'" style="background-color: red; color: white; width: 100%;">VIEW MESSAGES FROM USER</button>
+  <button onclick="window.location.href='https://masomodigital.github.io/post-message/'" class="btn-red">VIEW MESSAGES FROM USER</button>
   
   <div id="loginError" class="error"></div>
 </div>
@@ -98,7 +156,7 @@
 <div id="main-content">
   <h1>View Messages by Promo Code</h1>
 
-  <div style="background-color: #e6f2ff; border: 1px solid #b3d1ff; padding: 15px; margin-bottom: 20px; border-radius: 5px; font-size: 16px; line-height: 1.6;">
+  <div class="info-box">
     <strong>Share Your Promo Code to Receive Messages for <span style="color:red;">FREE!</span></strong><br><br>
     You can share your Promo Code with your users, allowing them to send you messages at no cost. Users on the Safaricom network can send SMS offline by texting their message to the shortcode <strong><span style="color:red;">40015</span></strong>.<br><br>
 
@@ -114,9 +172,9 @@
   <div class="form-container">
     <input type="text" id="promoCode" placeholder="Enter your Promo Code" />
     <input type="date" id="filterDate" />
-    <button onclick="fetchMessages()" style="background-color: green; color: white;">View Messages</button>
-    <button onclick="window.location.href='https://masomodigital.github.io/sms-credits-balance/'" style="background-color: red; color: white;">Get my Promo Code</button>
-    <button onclick="window.location.href='https://masomodigital.github.io/REVERSE-SMS/'" style="background-color: black; color: white;">Reverse SMS</button>
+    <button onclick="fetchMessages()" class="btn-green">View Messages</button>
+    <button onclick="window.location.href='https://masomodigital.github.io/sms-credits-balance/'" class="btn-red">Get my Promo Code</button>
+    <button onclick="window.location.href='https://masomodigital.github.io/REVERSE-SMS/'" class="btn-black">Reverse SMS</button>
   </div>
 
   <div class="error" id="errorMsg"></div>
@@ -217,15 +275,15 @@
             ${msg.source}
             <button 
               onclick="navigator.clipboard.writeText('${msg.source}').then(() => alert('Copied!'))" 
-              style="margin-left: 5px; padding: 2px 6px; font-size: 12px; color: white; background-color: #87CEEB; border: none; border-radius: 3px; cursor: pointer;">
+              class="copy-btn">
               Copy
             </button>
           </td>
           <td>${msg.message}</td>
           <td>
-  <div>${msg.timestamp.split(' ')[0]}</div>
-  <div style="color: green; font-weight: bold;">${msg.timestamp.split(' ')[1]}</div>
-</td>
+            <div>${msg.timestamp.split(' ')[0]}</div>
+            <div style="color: green; font-weight: bold;">${msg.timestamp.split(' ')[1]}</div>
+          </td>
         `;
         body.appendChild(row);
       });
